@@ -1,16 +1,13 @@
 import './App.css';
 import React, { useEffect, useState } from 'react';
-import {Formik, Form, Field} from 'formik'
+import {Formik, Form, Field, setIn} from 'formik'
 
 function App() {
   const [inventory, setInventory] = useState([])
   
 
 
-  const items = [1, 2, 3, 4, 5]
-  const listItems = items.map((item, key) => 
-  <li key={key}>{item}</li> 
-  )
+  
 
   const fetchItems = async() =>{
     await fetch('http://127.0.0.1:8000/items/', {
@@ -34,10 +31,27 @@ function App() {
   
     })
     .then(res => res.json()
-    ).then(data => setInventory(...inventory, data))
-  
+    ).then(data => setInventory([...inventory, data])
+    ).then(console.log(inventory))
   }
 
+  const deleteItem= async (item) =>{
+    await fetch(`http://127.0.0.1:8000/item/${item.id}`, {
+      method: 'DELETE',
+      headers:{
+      'Accept': 'application/json, text/plain, */*',
+      'Content-Type': 'application/json',
+      }
+    })
+    .then(data=> setInventory())
+      
+  }
+
+
+
+  const listItems = inventory.map((item, key) => 
+  <li key={key}>Name: {item.name} Quantity: {item.quantity} Weight: {item.weight}` <button onClick={() => deleteItem(item)}>DELETE</button></li> 
+  )
   return (
     <div className="App">
       <h1>Inventory Manager</h1>
@@ -74,6 +88,7 @@ function App() {
         {listItems}
       </ul>
     </div>
+      
     </div>
   );
 }
